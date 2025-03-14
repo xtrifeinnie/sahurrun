@@ -29,79 +29,70 @@
     <div id="map" class="leaflet-map"></div>
 
     <script>
-        let opts = {
-            map: {
-                center: [-6.593821394258885, 106.90297044855343],
-                zoom: 5,
-                fullscreenControl: false,
-                layersControl: false,
-                minimapControl: false,
-                searchControl: false,
-                locateControl: false,
-                pegmanControl: false,
-                resizerControl: false,
-                gestureHandling: false,
-                preferCanvas: true,
-                mapTypeId: 'satellite',
-                rotate: false,
-                zoomControl: false, // Menonaktifkan kontrol zoom
-                dragging: false, // Nonaktifkan dragging
-                scrollWheelZoom: false, // Nonaktifkan zoom dengan scroll mouse
-                doubleClickZoom: false, // Nonaktifkan zoom dengan klik dua kali
-                touchZoom: false, // Nonaktifkan zoom dengan touch gestures
-                keyboard: false // Nonaktifkan kontrol keyboard
+    let opts = {
+        map: {
+            center: [-6.593821394258885, 106.90297044855343],
+            zoom: 5,
+            fullscreenControl: false,
+            layersControl: false,
+            minimapControl: false,
+            searchControl: false,
+            locateControl: false,
+            pegmanControl: false,
+            resizerControl: false,
+            gestureHandling: false,
+            preferCanvas: true,
+            mapTypeId: 'satellite',
+            rotate: false,
+            zoomControl: true, // Aktifkan kontrol zoom
+            dragging: true, // Aktifkan dragging
+            scrollWheelZoom: true, // Aktifkan zoom dengan scroll mouse
+            doubleClickZoom: true, // Aktifkan zoom dengan klik dua kali
+            touchZoom: true, // Aktifkan zoom dengan touch gestures
+            keyboard: true // Aktifkan kontrol keyboard
+        },
+        elevationControl: {
+            url: "https://xtrifeinnie.github.io/sahurrun/posrunners/posrunners-sahurrun2025.gpx",
+            options: {
+                theme: "lightblue-theme",
+                width: 100,
+                height: 150,
+                collapsed: false,
+                autohide: false,
+                autofitBounds: true,
+                position: "bottomleft",
+                detached: true,
+                summary: false,
+                imperial: false,
+                downloadLink: false,
+                slope: "disabled",
+                speed: false,
+                acceleration: false,
+                time: false,
+                legend: true,
+                followMarker: true,
+                almostOver: true,
+                distanceMarkers: false,
+                hotline: false,
             },
-            elevationControl: {
-                url: "https://xtrifeinnie.github.io/sahurrun/posrunners/posrunners-sahurrun2025.gpx",
-                options: {
-                    theme: "lightblue-theme",
-                    width: 100,
-                    height: 150,
-                    collapsed: false,
-                    autohide: false,
-                    autofitBounds: true,
-                    position: "bottomleft",
-                    detached: true,
-                    summary: false,
-                    imperial: false,
-                    downloadLink: false,
-                    slope: "disabled",
-                    speed: false,
-                    acceleration: false,
-                    time: false,
-                    legend: true,
-                    followMarker: true,
-                    almostOver: true,
-                    distanceMarkers: false,
-                    hotline: false,
-                },
+        },
+        layersControl: {
+            options: {
+                collapsed: false,
             },
-            layersControl: {
-                options: {
-                    collapsed: false,
-                },
-            },
-        };
+        },
+    };
 
-        let map = L.map('map', opts.map);
+    let map = L.map('map', opts.map);
 
-        // Menonaktifkan semua bentuk zoom setelah peta terinisialisasi
-        map.scrollWheelZoom.disable(); 
-        map.doubleClickZoom.disable();
-        map.touchZoom.disable(); 
-        map.dragging.disable();
-        map.keyboard.disable();
+    let controlElevation = L.control.elevation(opts.elevationControl.options).addTo(map);
+    let controlLayer = L.control.layers(null, null, opts.layersControl.options);
 
-        // Tambahkan ini untuk memastikan kontrol zoom dinonaktifkan
-        map.zoomControl?.disable();
+    controlElevation.on('eledata_loaded', ({ layer, name }) => controlLayer.addTo(map) && layer.eachLayer((trkseg) => trkseg.feature.geometry.type != "Point" && controlLayer.addOverlay(trkseg, trkseg.feature && trkseg.feature.properties && trkseg.feature.properties.name || name)));
 
-        let controlElevation = L.control.elevation(opts.elevationControl.options).addTo(map);
-        let controlLayer = L.control.layers(null, null, opts.layersControl.options);
+    controlElevation.load(opts.elevationControl.url);
+</script>
 
-        controlElevation.on('eledata_loaded', ({ layer, name }) => controlLayer.addTo(map) && layer.eachLayer((trkseg) => trkseg.feature.geometry.type != "Point" && controlLayer.addOverlay(trkseg, trkseg.feature && trkseg.feature.properties && trkseg.feature.properties.name || name)));
-
-        controlElevation.load(opts.elevationControl.url);
-    </script>
 
     <!-- i18n -->
     <script>
